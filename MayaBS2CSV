@@ -1,0 +1,25 @@
+import maya.cmds as cmds
+import csv
+
+def export_blendshapes_to_csv(file_path):
+    # ブレンドシェイプのリストを取得
+    blendshapes = cmds.ls(type='blendShape')
+
+    # CSVファイルを開く
+    with open(file_path, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+
+        # ヘッダーを書き込む
+        csv_writer.writerow(['BlendShape', 'Target', 'Weight'])
+
+        # 各ブレンドシェイプの情報を書き込む
+        for blendshape in blendshapes:
+            targets = cmds.listAttr(blendshape + '.w', m=True) or []
+            for target in targets:
+                # ターゲットの重みを取得
+                weight = cmds.getAttr(blendshape + '.' + target)
+                # CSVに書き込む
+                csv_writer.writerow([blendshape, target, weight])
+
+project_directory = cmds.workspace(q=True, rd=True)
+export_blendshapes_to_csv(project_directory + '/blendshapes.csv')
